@@ -4,9 +4,11 @@ import './Home.css';
 export default function Home() {
   return (
     <div>
-      <b><h1 className="heading">
+      <b><p className="heading">
         This is the Home Page
-      </h1></b>
+      </p></b>
+      <h2 className="heading">
+        You're welcome to PerizelHub</h2>
     </div>
   );
 }

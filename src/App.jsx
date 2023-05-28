@@ -1,32 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Link, Outlet, NavLink, Navigate } from "react-router-dom";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Home from "./Components/Home";
 import Form from "./Components/Form";
-import JokeApi from "./Components/JokeApi";
+import JokesApi from "./Components/JokeApi";
 import Register from "./Components/Auth/Register";
 import Login from "./Components/Auth/Login";
 import ApiMeaning from "./Components/ApiMeaning";
+import UserList from "./Components/Auth/UserList";
 
 import "./App.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      setIsLoggedIn(true);
-    }
+    setIsLoggedIn(true);
   }, []);
 
-  const handleLogin = (user) => {
-    localStorage.setItem("user", JSON.stringify(user));
+  const handleLogin = () => {
     setIsLoggedIn(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
     setIsLoggedIn(false);
+  };
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
   };
 
   const ProtectedRoute = ({ path, element }) => {
@@ -35,56 +36,61 @@ function App() {
 
   return (
     <div>
-      <nav className="navbar">
-        <Link to="/" className="navbar-link">
-          Home
-        </Link>
-        <Link to="form" className="navbar-link">
-          Form
-        </Link>
-        <Link to="jokes-api" className="navbar-link">
-          Jokes
-        </Link>
-        <Link to="register" className="navbar-link">
-          Register
-        </Link>
-        <Link to="api-meaning" className="navbar-link">
-          API Meaning
-        </Link>
-        <div className="navbar-right">
-          {isLoggedIn ? (
-            <button onClick={handleLogout} className="navbar-link">
-              Logout
+      <nav>
+        <div className="left-links">
+          <Link to="/">Home</Link>
+          <div className="dropdown">
+            <button onClick={toggleDropdown} className="dropbtn">
+              Menu
             </button>
+            {showDropdown && (
+              <div className="dropdown-content">
+                <Link to="form">Form</Link>
+                <Link to="jokes-api">Jokes</Link>
+                <Link to="api-meaning">API Meaning</Link>
+                <Link to="user-list">User List</Link>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="right-links">
+          {isLoggedIn ? (
+            <button onClick={handleLogout}>Logout</button>
           ) : (
-            <Link to="login" className="navbar-link">
-              Login
-            </Link>
+            <>
+              <Link to="register">Register</Link>
+              <Link to="login">Login</Link>
+            </>
           )}
         </div>
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="form" element={<Form />} />
-        <Route path="jokes-api" element={<JokeApi />} />
+        <Route path="jokes-api" element={<JokesApi />} />
         <Route path="register" element={<Register />} />
         <Route
           path="login"
           element={
-            isLoggedIn ? (
-              <Navigate to="/" />
-            ) : (
-              <Login onLogin={handleLogin} />
-            )
+            isLoggedIn ? <Navigate to="/" /> : <Login onLogin={handleLogin} />
           }
         />
         <Route
           path="api-meaning"
           element={
-            <ProtectedRoute
-              path="api-meaning"
-              element={<ApiMeaning />}
-            />
+            <ProtectedRoute path="api-meaning" element={<ApiMeaning />} />
+          }
+        />
+        <Route
+          path="user-list"
+          element={<ProtectedRoute path="user-list" element={<UserList />} />}
+        />
+        <Route
+          path="*"
+          element={
+            <h1>
+              Not Found, go back home <Link to="/">Home</Link>
+            </h1>
           }
         />
       </Routes>
